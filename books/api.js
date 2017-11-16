@@ -107,11 +107,15 @@ router.delete('/:book', (req, res, next) => {
 router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   const entry = Object.assign({}, req.body, {createdAt: Date.now()})
 
+  console.log("Telemetry webhook has been hit! req.body: ", req.body)
+
   getModel().create(entry, (err, entity) => {
     if (err) {
       next(err);
       return;
     }
+
+    console.log("saving entity: ", entity)
 
     res.json(entity);
   });

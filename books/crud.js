@@ -43,6 +43,8 @@ router.get('/', (req, res, next) => {
       return;
     }
 
+    console.log("Rendering List Page!")
+
     res.render('books/list.pug', {
       books: entities.map(entity => {
         const createdAt = new Date(entity.createdAt)

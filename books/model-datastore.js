@@ -42,7 +42,6 @@ const kind = 'Book';
 function fromDatastore (obj) {
 
   obj.id = obj[Datastore.KEY].id;
-  console.log("fromDatastore obj: ", obj)
   return obj;
 }
 
@@ -71,7 +70,6 @@ function fromDatastore (obj) {
 //   ]
 function toDatastore (obj, nonIndexed) {
 
-  // console.log("toDatastore obj: ", obj, ", nonIndexed: ", nonIndexed)
   nonIndexed = nonIndexed || [];
   const results = [];
   Object.keys(obj).forEach((k) => {
@@ -86,7 +84,6 @@ function toDatastore (obj, nonIndexed) {
     });
   });
 
-  console.log("toDatastore results: ", results)
   return results;
 }
 
@@ -107,7 +104,6 @@ function list (limit, token, cb) {
       return;
     }
 
-    console.log("list entities: ", entities)
     const hasMore = nextQuery.moreResults !== Datastore.NO_MORE_RESULTS ? nextQuery.endCursor : false;
     cb(null, entities.map(fromDatastore), hasMore);
   });
@@ -139,7 +135,6 @@ function update (id, data, cb) {
     (err) => {
       data.id = entity.key.id;
 
-      console.log("update entity: ", entity, ", data: ", data, ", err: ", err)
       cb(err, err ? null : data);
     }
   );
