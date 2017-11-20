@@ -28,6 +28,9 @@ app.set('trust proxy', true);
 app.use('/books', require('./books/crud'));
 app.use('/api/books', require('./books/api'));
 
+//For serving google verification
+app.use('/', express.static(path.join(__dirname)));
+
 
 // Redirect root to /books
 app.get('/', (req, res) => {
