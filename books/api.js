@@ -108,11 +108,13 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   const reqBody = req && req.body 
   const entryData = reqBody &&
     reqBody.message &&
-    reqBody.message.data &&
-    Buffer.from(reqBody.message.data, 'base64');
+    reqBody.message.data
+
+
+  const decodedData = Buffer.from(entryData, 'base64');
   const entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
 
-  console.log("Telemetry webhook has been hit! decoded entryData: ", entryData)
+  console.log("Telemetry webhook has been hit! decodedData: ", decodedData)
 
   getModel().create(entry, (err, entity) => {
     if (err) {
