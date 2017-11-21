@@ -117,6 +117,8 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   console.log("---START---")
   console.log("reqBody.message.data: ", reqBody.message.data)
   console.log("Telemetry webhook has been hit! decodedData.toString(): ", decodedData.toString())
+  console.log("decodedData buffer .toJSON(): ", decodedData.toJSON())
+  console.log("JSON.parse(decodedData.toString()): ", JSON.parse(decodedData.toString()))
 
   console.log("---END---")
 
