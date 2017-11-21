@@ -106,10 +106,13 @@ router.delete('/:book', (req, res, next) => {
 //Telemetry Push Subscription Web hook
 router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   const reqBody = req && req.body 
-  const entryData = reqBody && reqBody.message && reqBody.message.data
+  const entryData = reqBody &&
+    reqBody.message &&
+    reqBody.message.data &&
+    Buffer.from(reqBody.message.data, 'base64');
   const entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
 
-  console.log("Telemetry webhook has been hit! req.body.message.data: ", req && req.body && req.body.message && req.body.message.data)
+  console.log("Telemetry webhook has been hit! decoded entryData: ", entryData)
 
   getModel().create(entry, (err, entity) => {
     if (err) {
