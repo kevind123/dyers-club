@@ -16,11 +16,12 @@
 const Datastore = require('@google-cloud/datastore');
 const config = require('../config');
 
+
 // [START config]
 const ds = Datastore({
   projectId: config.get('GCLOUD_PROJECT')
 });
-const kind = 'Book';
+const kind = 'Device';
 // [END config]
 
 // Translates from Datastore's entity format to
@@ -114,19 +115,29 @@ function list (limit, token, cb) {
 // data is automatically translated into Datastore format. The book will be
 // queued for background processing.
 // [START update]
-function update (id, data, cb) {
+function update (entryKind, id, data, cb) {
   let key;
 
+  //todo: get
+
   if (id) {
-    key = ds.key([kind, parseInt(id, 10)]);
+    key = ds.key([entryKind, parseInt(id, 10)]);
   } else {
-    key = ds.key(kind);
+    //This means we are creating a new one
+    key = ds.key(entryKind);
   }
 
   const entity = {
     key: key,
-    data: toDatastore(data, ['description'])
+    data: toDatastore(data, ['values'])
   };
+
+  // console.log("update entryKind: ", entryKind, ", id: ", id, ", data: ", data)
+  // console.log("update key: ", key)
+  // console.log("madeup key: ", ds.key(['siteCd', 'deviceCd', 'usageType', 'intervalType']))
+
+  //TODO: update key to use the day timestamp
+
 
   
 
@@ -145,8 +156,10 @@ function create (data, cb) {
   update(null, data, cb);
 }
 
-function read (id, cb) {
-  const key = ds.key([kind, parseInt(id, 10)]);
+function read (entryKind = kind, id, cb) {
+
+  // console.log("read entrKind: ", entryKind, ", id: ", id)
+  const key = ds.key([entryKind, parseInt(id, 10)]);
   ds.get(key, (err, entity) => {
     if (!err && !entity) {
       err = {

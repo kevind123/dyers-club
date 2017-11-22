@@ -15,9 +15,19 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const moment = require('moment');
 
 function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
+}
+
+
+function getEntryKind (entry) {
+  return `${entry.siteCd}-${entry.deviceCd}-${entry.usageType}-${entry.intervalType}`
+}
+function getStartOfDayEpoch (entry) {
+  const date = moment.utc(entry.timestamp).format('YYYY-MM-DD')
+  return moment.utc(date).valueOf()
 }
 
 const router = express.Router();
@@ -109,32 +119,110 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   const entryData = reqBody &&
     reqBody.message &&
     reqBody.message.data
+  let decodedData
+  let dataObj
+  let entry
 
+  // console.log("reqBody: ", reqBody)
+  // console.log("entryData: ", entryData)
 
-  const decodedData = Buffer.from(entryData, 'base64');
-  const dataObj = JSON.parse(decodedData.toString());
-  const entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
+  if (entryData) {
+    decodedData = Buffer.from(entryData, 'base64');
+    dataObj = JSON.parse(decodedData.toString());
 
-  console.log("---START---")
-  console.log("reqBody.message.data: ", reqBody.message.data)
-  console.log("Telemetry webhook has been hit! decodedData.toString(): ", decodedData.toString())
-  console.log("decodedData buffer .toJSON(): ", decodedData.toJSON && decodedData.toJSON())
-  console.log("JSON.parse(decodedData.toString()): ", dataObj)
-  console.log("dataObj.usages: ", dataObj && dataObj.usages)
+    // TODO: create a key from the siteCd, deviceCd, usageType and dateRange, 
 
-  console.log("---END---")
+    //TODO: update
+    // entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
+
+    const entries = dataObj && dataObj.usages.map(usage => {
+      return {
+        ...usage, //includes intervalType, usageType, timestamp, and value
+        siteCd: reqBody.attributes.siteCd,
+        gatewayCd: reqBody.attributes.gatewayCd,
+        // startOfDay: getStartOfDayEpoch(usage.timestamp)
+      }
+    })
+    // .filter(entry => getEntryKind(entry))
+    .forEach(entry => {
+      //find existing entry
+      //NOTE: first arg is id - but note: need to have different key for each device and usage type
+
+      // console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
+      let nextEntry
+      getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
+        // if (err) {
+        //   next(err);
+        //   return;
+        // }
+        // res.json(entity);
+
+        // console.log("getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry), ", existingEntry: ", existingEntry)
+
+        if (existingEntry) {
+          nextEntry = {
+            ...existingEntry,
+            values: {
+              [entry.timestamp]: entry.value
+            }
+          }
+        } else {
+          nextEntry = {
+            ...entry,
+            values: {
+              [parseInt(entry.timestamp)]: entry.value
+            }
+          }
+
+          delete nextEntry.value
+        }
+
+        // console.log("nextEntry: ", nextEntry);
+
+        //TODO: save nextEntry
+        getModel().update(getEntryKind(nextEntry), getStartOfDayEpoch(nextEntry), nextEntry, (err, updatedEntry) => {
+          if (err) {
+            next(err);
+            return;
+          }
+
+          // console.log("returning response of nextEntry: ", nextEntry)
+          // res.send(nextEntry);
+          // res.json(nextEntry);
+          // res.send();
+          // res.status(200).send('OK');
+        });
+      });
+    });
+
+    //TODO: use the entry datetime 
+
+    // console.log("---START---")
+    // console.log("JSON.parse(decodedData.toString()) first usage!: ", dataObj.usages[0])
+    // console.log("---END---")
+
+    //TODO: first try to get the exisiting entry
+
+    // getModel().create(entry, (err, entity) => {
+    //   if (err) {
+    //     next(err);
+    //     return;
+    //   }
+
+    //   // console.log("saving entity: ", entity)
+
+    //   res.json(entity);
+    // });
+    res.status(200).send('OK');
+  } else {
+    console.log("No dataObject was found!")
+    
+    res.status(204).send()
+  }
+
+  //TODO: loop through dataObj.usages, get resource, update with new data, and resave
 
   //NOTE: this needs to be updated
-  getModel().create(entry, (err, entity) => {
-    if (err) {
-      next(err);
-      return;
-    }
-
-    // console.log("saving entity: ", entity)
-
-    res.json(entity);
-  });
 })
 
 /**
