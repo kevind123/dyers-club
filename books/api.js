@@ -134,7 +134,7 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
 
     //TODO: update
     // entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
-
+    console.log("reqBody: ", reqBody)
     const entries = dataObj && dataObj.usages.map(usage => {
       return {
         ...usage, //includes intervalType, usageType, timestamp, and value
