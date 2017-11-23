@@ -115,13 +115,13 @@ router.delete('/:book', (req, res, next) => {
 
 //Telemetry Push Subscription Web hook
 router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
-  const reqBody = req && req.body 
+  const reqBody = req && req.body;
   const entryData = reqBody &&
     reqBody.message &&
-    reqBody.message.data
-  let decodedData
-  let dataObj
-  let entry
+    reqBody.message.data;
+  let decodedData;
+  let dataObj;
+  let entry;
 
   // console.log("reqBody: ", reqBody)
   // console.log("entryData: ", entryData)
@@ -134,8 +134,10 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
 
     //TODO: update
     // entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
-    console.log("reqBody.attributes: ", reqBody.attributes)
-    console.log("reqBody.attributes.siteCd: ", reqBody.attributes && reqBody.attributes.siteCd)
+    console.log("reqBody: ", reqBody);
+    console.log("Object.keys(reqBody): ", Object.keys(reqBody));
+    console.log("reqBody.attributes: ", reqBody.attributes);
+    console.log("reqBody.attributes.siteCd: ", reqBody.attributes && reqBody.attributes.siteCd);
     const entries = dataObj && dataObj.usages.map(usage => {
       return {
         ...usage, //includes intervalType, usageType, timestamp, and value
