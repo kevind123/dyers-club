@@ -53,6 +53,7 @@ function updateDeviceData (streams, reqBody) {
         nextEntry = {
           ...existingEntry,
           values: {
+            ...existingEntry.values || {},
             [parseInt(entry.timestamp)]: entry.value
           }
         }
