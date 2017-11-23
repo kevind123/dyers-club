@@ -30,6 +30,54 @@ function getStartOfDayEpoch (entry) {
   return moment.utc(date).valueOf()
 }
 
+//stream could be either events or usages
+function updateDeviceData (streams, reqBody) {
+  streams.map(stream => {
+    console.log("reqBody.message: ", reqBody.message);
+    return {
+      ...stream, //includes intervalType, usageType, timestamp, and value
+      siteCd: reqBody.message.attributes && reqBody.message.attributes.siteCd, //empty???
+      gatewayCd: reqBody.message.attributes && reqBody.message.attributes.gatewayCd,
+    }
+  })
+  // .filter(entry => getEntryKind(entry))
+  .forEach(entry => {
+    //find existing entry
+    //NOTE: first arg is id - but note: need to have different key for each device and usage type
+
+    console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
+    let nextEntry
+    getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
+
+      if (existingEntry) {
+        nextEntry = {
+          ...existingEntry,
+          values: {
+            [parseInt(entry.timestamp)]: entry.value
+          }
+        }
+      } else {
+        nextEntry = {
+          ...entry,
+          values: {
+            [parseInt(entry.timestamp)]: entry.value
+          }
+        }
+
+        delete nextEntry.value
+      }
+
+      //TODO: save nextEntry
+      getModel().update(getEntryKind(nextEntry), getStartOfDayEpoch(nextEntry), nextEntry, (err, updatedEntry) => {
+        if (err) {
+          next(err);
+          return;
+        }
+      });
+    });
+  });
+}
+
 const router = express.Router();
 
 // Automatically parse request body as JSON
@@ -138,67 +186,78 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     // console.log("Object.keys(reqBody.message): ", Object.keys(reqBody.message));
     // console.log("reqBody.message.attributes: ", reqBody.message.attributes);
     // console.log("reqBody.message.attributes.siteCd: ", reqBody.message.attributes && reqBody.message.attributes.siteCd);
-    console.log("entryData: ", entryData)
-    console.log("dataObj: ", dataObj)
-    console.log("dataObj.usages: ", dataObj && dataObj.usages)
-    const entries = dataObj && dataObj.usages.map(usage => {
-      return {
-        ...usage, //includes intervalType, usageType, timestamp, and value
-        siteCd: reqBody.message.attributes && reqBody.message.attributes.siteCd,
-        gatewayCd: reqBody.message.attributes && reqBody.message.attributes.gatewayCd,
-      }
-    })
-    // .filter(entry => getEntryKind(entry))
-    .forEach(entry => {
-      //find existing entry
-      //NOTE: first arg is id - but note: need to have different key for each device and usage type
+    console.log("entryData: ", entryData);
+    console.log("dataObj: ", dataObj);
+    console.log("dataObj.usages: ", dataObj.usages);
+    console.log("dataObj.events: ", dataObj.events);
 
-      console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
-      let nextEntry
-      getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
-        // if (err) {
-        //   next(err);
-        //   return;
-        // }
-        // res.json(entity);
+    if (dataObj.usages) {
+      updateDeviceData(dataObj.usages, reqBody);
+    }
+    if (dataObj.events) {
+      updateDeviceData(dataObj.events, reqBody);
+    }
+    
 
-        // console.log("getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry), ", existingEntry: ", existingEntry)
+    //BIG TODO: need to also include dataObj.events
+    // const entries = dataObj && dataObj.usages && dataObj.usages.map(usage => {
+    //   return {
+    //     ...usage, //includes intervalType, usageType, timestamp, and value
+    //     siteCd: reqBody.message.attributes && reqBody.message.attributes.siteCd,
+    //     gatewayCd: reqBody.message.attributes && reqBody.message.attributes.gatewayCd,
+    //   }
+    // })
+    // // .filter(entry => getEntryKind(entry))
+    // .forEach(entry => {
+    //   //find existing entry
+    //   //NOTE: first arg is id - but note: need to have different key for each device and usage type
 
-        if (existingEntry) {
-          nextEntry = {
-            ...existingEntry,
-            values: {
-              [entry.timestamp]: entry.value
-            }
-          }
-        } else {
-          nextEntry = {
-            ...entry,
-            values: {
-              [parseInt(entry.timestamp)]: entry.value
-            }
-          }
+    //   console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
+    //   let nextEntry
+    //   getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
+    //     // if (err) {
+    //     //   next(err);
+    //     //   return;
+    //     // }
+    //     // res.json(entity);
 
-          delete nextEntry.value
-        }
+    //     // console.log("getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry), ", existingEntry: ", existingEntry)
 
-        // console.log("nextEntry: ", nextEntry);
+    //     if (existingEntry) {
+    //       nextEntry = {
+    //         ...existingEntry,
+    //         values: {
+    //           [entry.timestamp]: entry.value
+    //         }
+    //       }
+    //     } else {
+    //       nextEntry = {
+    //         ...entry,
+    //         values: {
+    //           [parseInt(entry.timestamp)]: entry.value
+    //         }
+    //       }
 
-        //TODO: save nextEntry
-        getModel().update(getEntryKind(nextEntry), getStartOfDayEpoch(nextEntry), nextEntry, (err, updatedEntry) => {
-          if (err) {
-            next(err);
-            return;
-          }
+    //       delete nextEntry.value
+    //     }
 
-          // console.log("returning response of nextEntry: ", nextEntry)
-          // res.send(nextEntry);
-          // res.json(nextEntry);
-          // res.send();
-          // res.status(200).send('OK');
-        });
-      });
-    });
+    //     // console.log("nextEntry: ", nextEntry);
+
+    //     //TODO: save nextEntry
+    //     getModel().update(getEntryKind(nextEntry), getStartOfDayEpoch(nextEntry), nextEntry, (err, updatedEntry) => {
+    //       if (err) {
+    //         next(err);
+    //         return;
+    //       }
+
+    //       // console.log("returning response of nextEntry: ", nextEntry)
+    //       // res.send(nextEntry);
+    //       // res.json(nextEntry);
+    //       // res.send();
+    //       // res.status(200).send('OK');
+    //     });
+    //   });
+    // });
 
     //TODO: use the entry datetime 
 
