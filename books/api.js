@@ -148,7 +148,7 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
       //find existing entry
       //NOTE: first arg is id - but note: need to have different key for each device and usage type
 
-      // console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
+      console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
       let nextEntry
       getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
         // if (err) {
