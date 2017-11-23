@@ -135,14 +135,14 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     //TODO: update
     // entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
     console.log("reqBody: ", reqBody);
-    console.log("Object.keys(reqBody): ", Object.keys(reqBody));
-    console.log("reqBody.attributes: ", reqBody.attributes);
-    console.log("reqBody.attributes.siteCd: ", reqBody.attributes && reqBody.attributes.siteCd);
+    console.log("Object.keys(reqBody.message): ", Object.keys(reqBody.message));
+    console.log("reqBody.message.attributes: ", reqBody.message.attributes);
+    console.log("reqBody.message.attributes.siteCd: ", reqBody.message.attributes && reqBody.message.attributes.siteCd);
     const entries = dataObj && dataObj.usages.map(usage => {
       return {
         ...usage, //includes intervalType, usageType, timestamp, and value
-        siteCd: reqBody.attributes && reqBody.attributes.siteCd,
-        gatewayCd: reqBody.attributes && reqBody.attributes.gatewayCd,
+        siteCd: reqBody.message.attributes && reqBody.message.attributes.siteCd,
+        gatewayCd: reqBody.message.attributes && reqBody.message.attributes.gatewayCd,
       }
     })
     // .filter(entry => getEntryKind(entry))
