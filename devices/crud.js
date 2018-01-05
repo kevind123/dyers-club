@@ -32,9 +32,9 @@ router.use((req, res, next) => {
 });
 
 /**
- * GET /books/add
+ * GET /devices
  *
- * Display a page of books (up to ten at a time).
+ * Display a page of devices (up to ten at a time).
  */
 router.get('/', (req, res, next) => {
   getModel().list(10, req.query.pageToken, (err, entities, cursor) => {
@@ -43,10 +43,8 @@ router.get('/', (req, res, next) => {
       return;
     }
 
-    console.log("Rendering List Page!")
-
-    res.render('books/list.pug', {
-      books: entities.map(entity => {
+    res.render('devices/list.pug', {
+      devices: entities.map(entity => {
         const createdAt = new Date(entity.createdAt)
         entity.usagesString = JSON.stringify(entity.usages)
         entity.createdAt = `${createdAt.getMonth() - 1}/${createdAt.getDate()}/${createdAt.getFullYear()} ${createdAt.getHours()}:${createdAt.getMinutes()}:${createdAt.getSeconds()}`
@@ -58,108 +56,24 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * GET /books/add
+ * GET /devices/:id
  *
- * Display a form for creating a book.
+ * Display a data packet.
  */
-// [START add_get]
-router.get('/add', (req, res) => {
-  res.render('books/form.pug', {
-    book: {},
-    action: 'Add'
-  });
-});
-// [END add_get]
-
-/**
- * POST /books/add
- *
- * Create a book.
- */
-// [START add_post]
-router.post('/add', (req, res, next) => {
-  const data = req.body;
-
-  // Save the data to the database.
-  getModel().create(data, (err, savedData) => {
+router.get('/:device', (req, res, next) => {
+  getModel().read(req.params.device, (err, entity) => {
     if (err) {
       next(err);
       return;
     }
-    res.redirect(`${req.baseUrl}/${savedData.id}`);
-  });
-});
-// [END add_post]
-
-/**
- * GET /books/:id/edit
- *
- * Display a book for editing.
- */
-router.get('/:book/edit', (req, res, next) => {
-  getModel().read(req.params.book, (err, entity) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.render('books/form.pug', {
-      book: entity,
-      action: 'Edit'
+    res.render('devices/view.pug', {
+      device: entity
     });
   });
 });
 
 /**
- * POST /books/:id/edit
- *
- * Update a book.
- */
-router.post('/:book/edit', (req, res, next) => {
-  const data = req.body;
-
-  getModel().update(req.params.book, data, (err, savedData) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.redirect(`${req.baseUrl}/${savedData.id}`);
-  });
-});
-
-/**
- * GET /books/:id
- *
- * Display a book.
- */
-router.get('/:book', (req, res, next) => {
-  getModel().read(req.params.book, (err, entity) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.render('books/view.pug', {
-      book: entity
-    });
-  });
-});
-
-/**
- * GET /books/:id/delete
- *
- * Delete a book.
- */
-router.get('/:book/delete', (req, res, next) => {
-  getModel().delete(req.params.book, (err) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.redirect(req.baseUrl);
-  });
-});
-
-/**
- * Errors on "/books/*" routes.
+ * Errors on "/devices/*" routes.
  */
 router.use((err, req, res, next) => {
   // Format error and forward to generic error handler for logging and

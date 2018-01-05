@@ -24,17 +24,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.set('trust proxy', true);
 
-// Books
-app.use('/books', require('./books/crud'));
-app.use('/api/books', require('./books/api'));
 
-//For serving google verification
-app.use('/', express.static(path.join(__dirname)));
+// Devices
+app.use('/devices', require('./devices/crud'));
+app.use('/api/devices', require('./devices/api'));
 
-
-// Redirect root to /books
 app.get('/', (req, res) => {
-  res.redirect('/books');
+  res.redirect('/devices');
 });
 
 // Basic 404 handler

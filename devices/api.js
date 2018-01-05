@@ -16,6 +16,42 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment');
+// Imports the Google Cloud client library
+const PubSub = require('@google-cloud/pubsub');
+
+// Your Google Cloud Platform project ID
+// const projectId = 'kevins-club-1510687140500';
+const projectId = 'candi-dev';
+const subscriptionName = 'Dyer-Club-PULL.APT_GOOGLE_PUBSUB.subscription.114';
+const keyFilename = '/Users/kevind/candi/dyers-club/google-cloud-auth.json';
+
+// Instantiates a client
+const pubsub = PubSub({
+  projectId: projectId,
+  keyFilename: keyFilename
+});
+
+const subscription = pubsub.subscription(subscriptionName);
+
+// Create an event handler to handle messages
+let messageCount = 0;
+const messageHandler = (message) => {
+  console.log(`Received message ${message.id}:`);
+  console.log(`\tData: ${message.data}`);
+  console.log(`\tAttributes: ${message.attributes}`);
+  messageCount += 1;
+
+  // "Ack" (acknowledge receipt of) the message
+  message.ack();
+};
+
+// Listen for new messages until timeout is hit
+subscription.on(`message`, messageHandler);
+setTimeout(() => {
+  subscription.removeListener('message', messageHandler);
+  console.log(`${messageCount} message(s) received.`);
+}, 30000 * 1000);
+
 
 function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
@@ -89,78 +125,78 @@ router.use(bodyParser.json());
  *
  * Retrieve a page of books (up to ten at a time).
  */
-router.get('/', (req, res, next) => {
-  getModel().list(10, req.query.pageToken, (err, entities, cursor) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.json({
-      items: entities,
-      nextPageToken: cursor
-    });
-  });
-});
+// router.get('/', (req, res, next) => {
+//   getModel().list(10, req.query.pageToken, (err, entities, cursor) => {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     res.json({
+//       items: entities,
+//       nextPageToken: cursor
+//     });
+//   });
+// });
 
-/**
- * POST /api/books
- *
- * Create a new book.
- */
-router.post('/', (req, res, next) => {
-  getModel().create(req.body, (err, entity) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.json(entity);
-  });
-});
+// /**
+//  * POST /api/books
+//  *
+//  * Create a new book.
+//  */
+// router.post('/', (req, res, next) => {
+//   getModel().create(req.body, (err, entity) => {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     res.json(entity);
+//   });
+// });
 
-/**
- * GET /api/books/:id
- *
- * Retrieve a book.
- */
-router.get('/:book', (req, res, next) => {
-  getModel().read(req.params.book, (err, entity) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.json(entity);
-  });
-});
+// /**
+//  * GET /api/books/:id
+//  *
+//  * Retrieve a book.
+//  */
+// router.get('/:book', (req, res, next) => {
+//   getModel().read(req.params.book, (err, entity) => {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     res.json(entity);
+//   });
+// });
 
-/**
- * PUT /api/books/:id
- *
- * Update a book.
- */
-router.put('/:book', (req, res, next) => {
-  getModel().update(req.params.book, req.body, (err, entity) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.json(entity);
-  });
-});
+// /**
+//  * PUT /api/books/:id
+//  *
+//  * Update a book.
+//  */
+// router.put('/:book', (req, res, next) => {
+//   getModel().update(req.params.book, req.body, (err, entity) => {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     res.json(entity);
+//   });
+// });
 
-/**
- * DELETE /api/books/:id
- *
- * Delete a book.
- */
-router.delete('/:book', (req, res, next) => {
-  getModel().delete(req.params.book, (err) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.status(200).send('OK');
-  });
-});
+// /**
+//  * DELETE /api/books/:id
+//  *
+//  * Delete a book.
+//  */
+// router.delete('/:book', (req, res, next) => {
+//   getModel().delete(req.params.book, (err) => {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     res.status(200).send('OK');
+//   });
+// });
 
 //Telemetry Push Subscription Web hook
 router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
@@ -198,86 +234,7 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     if (dataObj.events) {
       updateDeviceData(dataObj.events, reqBody);
     }
-    
 
-    //BIG TODO: need to also include dataObj.events
-    // const entries = dataObj && dataObj.usages && dataObj.usages.map(usage => {
-    //   return {
-    //     ...usage, //includes intervalType, usageType, timestamp, and value
-    //     siteCd: reqBody.message.attributes && reqBody.message.attributes.siteCd,
-    //     gatewayCd: reqBody.message.attributes && reqBody.message.attributes.gatewayCd,
-    //   }
-    // })
-    // // .filter(entry => getEntryKind(entry))
-    // .forEach(entry => {
-    //   //find existing entry
-    //   //NOTE: first arg is id - but note: need to have different key for each device and usage type
-
-    //   console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
-    //   let nextEntry
-    //   getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
-    //     // if (err) {
-    //     //   next(err);
-    //     //   return;
-    //     // }
-    //     // res.json(entity);
-
-    //     // console.log("getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry), ", existingEntry: ", existingEntry)
-
-    //     if (existingEntry) {
-    //       nextEntry = {
-    //         ...existingEntry,
-    //         values: {
-    //           [entry.timestamp]: entry.value
-    //         }
-    //       }
-    //     } else {
-    //       nextEntry = {
-    //         ...entry,
-    //         values: {
-    //           [parseInt(entry.timestamp)]: entry.value
-    //         }
-    //       }
-
-    //       delete nextEntry.value
-    //     }
-
-    //     // console.log("nextEntry: ", nextEntry);
-
-    //     //TODO: save nextEntry
-    //     getModel().update(getEntryKind(nextEntry), getStartOfDayEpoch(nextEntry), nextEntry, (err, updatedEntry) => {
-    //       if (err) {
-    //         next(err);
-    //         return;
-    //       }
-
-    //       // console.log("returning response of nextEntry: ", nextEntry)
-    //       // res.send(nextEntry);
-    //       // res.json(nextEntry);
-    //       // res.send();
-    //       // res.status(200).send('OK');
-    //     });
-    //   });
-    // });
-
-    //TODO: use the entry datetime 
-
-    // console.log("---START---")
-    // console.log("JSON.parse(decodedData.toString()) first usage!: ", dataObj.usages[0])
-    // console.log("---END---")
-
-    //TODO: first try to get the exisiting entry
-
-    // getModel().create(entry, (err, entity) => {
-    //   if (err) {
-    //     next(err);
-    //     return;
-    //   }
-
-    //   // console.log("saving entity: ", entity)
-
-    //   res.json(entity);
-    // });
     res.status(200).send('OK');
   } else {
     console.log("No dataObject was found!")
