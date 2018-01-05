@@ -21,7 +21,7 @@ const config = require('../config');
 const ds = Datastore({
   projectId: config.get('GCLOUD_PROJECT')
 });
-const kind = 'Device';
+const kind = 'Devices';
 // [END config]
 
 // Translates from Datastore's entity format to
@@ -88,16 +88,14 @@ function toDatastore (obj, nonIndexed) {
   return results;
 }
 
-// Lists all books in the Datastore sorted alphabetically by title.
+// Lists all published data packets in the Datastore.
 // The ``limit`` argument determines the maximum amount of results to
 // return per page. The ``token`` argument allows requesting additional
-// pages. The callback is invoked with ``(err, books, nextPageToken)``.
+// pages. The callback is invoked with ``(err, devices, nextPageToken)``.
 // [START list]
 function list (limit, token, cb) {
   const q = ds.createQuery([kind])
     .limit(limit)
-    // .order('createdAt')
-    // .start(token);
 
   ds.runQuery(q, (err, entities, nextQuery) => {
     if (err) {
@@ -115,31 +113,22 @@ function list (limit, token, cb) {
 // data is automatically translated into Datastore format. The book will be
 // queued for background processing.
 // [START update]
-function update (entryKind, id, data, cb) {
+function update (id, data, cb) {
   let key;
 
   //todo: get
 
   if (id) {
-    key = ds.key([entryKind, parseInt(id, 10)]);
+    key = ds.key([kind, parseInt(id, 10)]);
   } else {
     //This means we are creating a new one
-    key = ds.key(entryKind);
+    key = ds.key(kind);
   }
 
   const entity = {
     key: key,
     data: toDatastore(data, ['values'])
   };
-
-  // console.log("update entryKind: ", entryKind, ", id: ", id, ", data: ", data)
-  // console.log("update key: ", key)
-  // console.log("madeup key: ", ds.key(['siteCd', 'deviceCd', 'usageType', 'intervalType']))
-
-  //TODO: update key to use the day timestamp
-
-
-  
 
   ds.save(
     entity,

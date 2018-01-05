@@ -18,10 +18,11 @@ block content
 
   each device in devices
     .media
-      a(href=`/devices/${device.id}`)
+      div
         .media-body
           h4= device.createdAt
-          p= device.usagesString
+          p= device.usageType
+          p= device.values
 
   if !devices.length
     p No Data packets found.

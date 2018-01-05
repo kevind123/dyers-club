@@ -57,146 +57,19 @@ function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
 }
 
-
-function getEntryKind (entry) {
-  return `${entry.siteCd}-${entry.deviceCd}-${entry.usageType}-${entry.intervalType}`
-}
-function getStartOfDayEpoch (entry) {
-  const date = moment.utc(entry.timestamp).format('YYYY-MM-DD')
-  return moment.utc(date).valueOf()
-}
-
-//stream could be either events or usages
-function updateDeviceData (streams, reqBody) {
-  streams.map(stream => {
-    console.log("reqBody.message: ", reqBody.message);
-    return {
-      ...stream, //includes intervalType, usageType, timestamp, and value
-      siteCd: reqBody.message.attributes && reqBody.message.attributes.siteCd, //empty???
-      gatewayCd: reqBody.message.attributes && reqBody.message.attributes.gatewayCd,
+function addDeviceData (streams, reqBody, next) {
+  getModel().create(entry, (err, entity) => {
+    if (err) {
+      next(err);
+      return;
     }
   })
-  // .filter(entry => getEntryKind(entry))
-  .forEach(entry => {
-    //find existing entry
-    //NOTE: first arg is id - but note: need to have different key for each device and usage type
-
-    console.log("entry: ", entry, ", getEntryKind(entry): ", getEntryKind(entry), ", getStartOfDayEpoch(entry): ", getStartOfDayEpoch(entry))
-    let nextEntry
-    getModel().read(getEntryKind(entry), getStartOfDayEpoch(entry), (err, existingEntry) => {
-
-      if (existingEntry) {
-        nextEntry = {
-          ...existingEntry,
-          values: {
-            ...existingEntry.values || {},
-            [parseInt(entry.timestamp)]: entry.value
-          }
-        }
-      } else {
-        nextEntry = {
-          ...entry,
-          values: {
-            [parseInt(entry.timestamp)]: entry.value
-          }
-        }
-
-        delete nextEntry.value
-      }
-
-      //TODO: save nextEntry
-      getModel().update(getEntryKind(nextEntry), getStartOfDayEpoch(nextEntry), nextEntry, (err, updatedEntry) => {
-        if (err) {
-          next(err);
-          return;
-        }
-      });
-    });
-  });
 }
 
 const router = express.Router();
 
 // Automatically parse request body as JSON
 router.use(bodyParser.json());
-
-/**
- * GET /api/books
- *
- * Retrieve a page of books (up to ten at a time).
- */
-// router.get('/', (req, res, next) => {
-//   getModel().list(10, req.query.pageToken, (err, entities, cursor) => {
-//     if (err) {
-//       next(err);
-//       return;
-//     }
-//     res.json({
-//       items: entities,
-//       nextPageToken: cursor
-//     });
-//   });
-// });
-
-// /**
-//  * POST /api/books
-//  *
-//  * Create a new book.
-//  */
-// router.post('/', (req, res, next) => {
-//   getModel().create(req.body, (err, entity) => {
-//     if (err) {
-//       next(err);
-//       return;
-//     }
-//     res.json(entity);
-//   });
-// });
-
-// /**
-//  * GET /api/books/:id
-//  *
-//  * Retrieve a book.
-//  */
-// router.get('/:book', (req, res, next) => {
-//   getModel().read(req.params.book, (err, entity) => {
-//     if (err) {
-//       next(err);
-//       return;
-//     }
-//     res.json(entity);
-//   });
-// });
-
-// /**
-//  * PUT /api/books/:id
-//  *
-//  * Update a book.
-//  */
-// router.put('/:book', (req, res, next) => {
-//   getModel().update(req.params.book, req.body, (err, entity) => {
-//     if (err) {
-//       next(err);
-//       return;
-//     }
-//     res.json(entity);
-//   });
-// });
-
-// /**
-//  * DELETE /api/books/:id
-//  *
-//  * Delete a book.
-//  */
-// router.delete('/:book', (req, res, next) => {
-//   getModel().delete(req.params.book, (err) => {
-//     if (err) {
-//       next(err);
-//       return;
-//     }
-//     res.status(200).send('OK');
-//   });
-// });
 
 //Telemetry Push Subscription Web hook
 router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
@@ -208,31 +81,20 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   let dataObj;
   let entry;
 
-  // console.log("reqBody: ", reqBody)
-  // console.log("entryData: ", entryData)
-
   if (entryData) {
     decodedData = Buffer.from(entryData, 'base64');
     dataObj = JSON.parse(decodedData.toString());
 
-    // TODO: create a key from the siteCd, deviceCd, usageType and dateRange, 
-
-    //TODO: update
-    // entry = Object.assign({}, reqBody.attributes, {createdAt: Date.now()})
-    // console.log("reqBody: ", reqBody);
-    // console.log("Object.keys(reqBody.message): ", Object.keys(reqBody.message));
-    // console.log("reqBody.message.attributes: ", reqBody.message.attributes);
-    // console.log("reqBody.message.attributes.siteCd: ", reqBody.message.attributes && reqBody.message.attributes.siteCd);
     console.log("entryData: ", entryData);
     console.log("dataObj: ", dataObj);
     console.log("dataObj.usages: ", dataObj.usages);
     console.log("dataObj.events: ", dataObj.events);
 
     if (dataObj.usages) {
-      updateDeviceData(dataObj.usages, reqBody);
+      addDeviceData(dataObj.usages, reqBody, next);
     }
     if (dataObj.events) {
-      updateDeviceData(dataObj.events, reqBody);
+      addDeviceData(dataObj.events, reqBody, next);
     }
 
     res.status(200).send('OK');
@@ -241,14 +103,10 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     
     res.status(204).send()
   }
-
-  //TODO: loop through dataObj.usages, get resource, update with new data, and resave
-
-  //NOTE: this needs to be updated
 })
 
 /**
- * Errors on "/api/books/*" routes.
+ * Errors on "/api/devices/*" routes.
  */
 router.use((err, req, res, next) => {
   // Format error and forward to generic error handler for logging and

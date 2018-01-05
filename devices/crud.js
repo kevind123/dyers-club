@@ -34,10 +34,10 @@ router.use((req, res, next) => {
 /**
  * GET /devices
  *
- * Display a page of devices (up to ten at a time).
+ * Display a page of devices (up to 20 at a time).
  */
 router.get('/', (req, res, next) => {
-  getModel().list(10, req.query.pageToken, (err, entities, cursor) => {
+  getModel().list(20, req.query.pageToken, (err, entities, cursor) => {
     if (err) {
       next(err);
       return;
@@ -45,10 +45,13 @@ router.get('/', (req, res, next) => {
 
     res.render('devices/list.pug', {
       devices: entities.map(entity => {
-        const createdAt = new Date(entity.createdAt)
-        entity.usagesString = JSON.stringify(entity.usages)
-        entity.createdAt = `${createdAt.getMonth() - 1}/${createdAt.getDate()}/${createdAt.getFullYear()} ${createdAt.getHours()}:${createdAt.getMinutes()}:${createdAt.getSeconds()}`
-        return entity
+        const createdAt = new Date(entity.timestamp * 1000)
+        return {
+          createdAt: `${createdAt.getMonth() - 1}/${createdAt.getDate()}/${createdAt.getFullYear()} ${createdAt.getHours()}:${createdAt.getMinutes()}:${createdAt.getSeconds()}`,
+          usageType: entity.usageType,
+          siteCd: entity.siteCd,
+          values: JSON.stringify(entity.values)
+        }
       }),
       nextPageToken: cursor
     });
