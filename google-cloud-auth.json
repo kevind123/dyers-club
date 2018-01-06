@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "kevins-club-1510687140500",
+  "private_key_id": "73912a0d06ceeb720e3a65198426aba81d3f7e16",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDE8/V8bXK1fYAw\n9T4nDwq4G8RYgnz8Nd9wS/LBOmXewJWVI1ylsmSsg4qcQU1W8GfY7HhPghlaNFa4\nV/BS3MOjFaDZVTcfLFGb5nKiUfxxTHnFJoBfC3PT3eWqwzHTn/JSTSmDhzYmG2nJ\nVEW1VJ3XOVmto03tkOMeiPgLYi0zYL+h9C0XT3J8JHBWW2oWy61DurQWR35Za48T\njHzMjzzscWaGPNRqOa8hTIXpyYLl26WffdPcl+BHTx/YZWqvHlPtLDf3abJ9O2hq\n2Sjwt2VVyRKlbAGvmbjZ9AqLZcimHDNF8Aa8x1pxg324eryWSPVnivakYFFwMzRL\nObt6c0TvAgMBAAECggEAQn0rYCygv3VVS/HW4B+7WikBkXHH2Osk+ceh9aqNznPM\na7Mq6UM+qmCj8Bk5j0KMhFZcTVcZ0PJ/Xi9N0eN2Zj18djJG8A6ppExZYcP0yZjs\nOOrFBpEasqkkChBoZ02FZFRpUd5ZIOc7QLzi5ZLh0FErnatWOP+jNOE/f7ROlxuX\nfHmfmHUChcwZRDUQyKqMDVfAY3lvkWUlgssD3VMlpLXjVsnkg7pMkKPC85L4DN9p\nrh2fQxBLMC7+69pTIbaNjvvV6hGHGdP+Egh3Ri4ZJ4fbRDRZLSoPINzGoo1wA9tW\nwmm0epuO46u+g29ZPUkReW4i9fQ+09X24Cc/eAVDSQKBgQD20I7XEcDJyXG6PVhC\nOR88R/qphps3UDUJUGxfA4LpZ3vUSkiHAeEbbsT+WB2tBfqtVLGze9VN0BnB9P/d\npSagjGDajT8vXkqzsuPgJYHyHvJV3JUBwJpGm6sq7pZruVKoU+UK/GAu7iqWLoIz\nPVURdqF12HZ6GVwe5lq+f//9BwKBgQDMSFxQ0dWN069uJAA2Bqdh4P6pAqG389Dh\nEZlQUTbTk3OQ5U2V6MvpgIE0fHfwR/cQWn7dAph2eF0JS5htpBJ+51p5ifI3x1p3\nCK6Wpw6aTJYO/TnGpWAYLqdMNoo4a9NgbOQxejO4VvLBKvbDn2d8fdmYKy4PUXZN\nYN24QvNm2QKBgQD00ovd6k5B2wBkrNUPW3oQYZXS8yKkC3uQcaYN2X3R6ER8n/Kx\neLvCam4dnWpSZsvxg0GBuCQtu27RZiUnxto6BwVLxTAX3IBdH+XKQWpUsT3Qza1A\nv7xIrcFsJJ4w3POQ5Scdbpo58yVrM1cTXJM1b2dZbg6XrvAh9n2s2WsjoQKBgF0A\n8K6G6c/5ORxO3Z27J8djFO3DWfcS1N0zEvbDEs/+iJXGH62JYBS9wZUwubY2PWA/\noxRh0yHUqJ7LwOjh0t3d3I4K5LDKXQBmfn3uLrLG/WZzmTM8JWS9EMOc7Q7E4GY9\nDSMNfLCHPVv+gHwNfaLq9P7XYc/tiYuu9yKlsIT5AoGBAK7kssjOZaWnzl0mxLf4\nivC8HF7pDz1IhNvLgQOPhAaptBMA6myLxYEPRW/WZ6rLSF4UQEVe+lyfYC+Jx7ZV\nVvOprFeXiD18DAr2+AwZRKyTdwnDIcgrUu/cdB/MIR2wXz4It5HmF6bOdYUZ3Sye\n+H15fvOgbITHxsmVWjHRTozR\n-----END PRIVATE KEY-----\n",
+  "client_email": "candi-subscriber-service@kevins-club-1510687140500.iam.gserviceaccount.com",
+  "client_id": "113839123131259966597",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/candi-subscriber-service%40kevins-club-1510687140500.iam.gserviceaccount.com"
+}
