@@ -23,12 +23,12 @@ const PubSub = require('@google-cloud/pubsub');
 // const projectId = 'kevins-club-1510687140500';
 const projectId = 'candi-dev';
 const subscriptionName = 'Dyer-Club-PULL.APT_GOOGLE_PUBSUB.subscription.114';
-const keyFilename = '/Users/kevind/candi/dyers-club/google-cloud-auth.json';
+// const keyFilename = '/Users/kevind/candi/dyers-club/google-cloud-auth.json';
 
 // Instantiates a client
 const pubsub = PubSub({
   projectId: projectId,
-  keyFilename: keyFilename
+  // keyFilename: keyFilename
 });
 
 const subscription = pubsub.subscription(subscriptionName);
