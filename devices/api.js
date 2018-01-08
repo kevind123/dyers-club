@@ -19,8 +19,8 @@ const moment = require('moment');
 // Imports the Google Cloud client library
 const PubSub = require('@google-cloud/pubsub');
 
-// Your Google Cloud Platform project ID
-// const projectId = 'kevins-club-1510687140500';
+
+//Pull Subscription
 const projectId = 'candi-dev';
 const subscriptionName = 'Dyer-Club-PULL.APT_GOOGLE_PUBSUB.subscription.114';
 const keyFilename = '/Users/kevind/candi/dyers-club/google-cloud-auth.json';
@@ -33,16 +33,22 @@ const pubsub = PubSub({
 
 const subscription = pubsub.subscription(subscriptionName);
 
-// Create an event handler to handle messages
+// Event handler to handle PubSub messages
 let messageCount = 0;
 const messageHandler = (message) => {
   console.log(`Received message ${message.id}:`);
   console.log(`\tData: ${message.data}`);
   console.log(`\tAttributes: ${message.attributes}`);
+
+  console.log("message.data.usages: ", message.data && message.data.usages)
+  console.log("message.data.usages: ", message.data && message.data.events)
   messageCount += 1;
 
   // "Ack" (acknowledge receipt of) the message
   message.ack();
+
+  //TODO call addDeviceData
+  // check if message.data.
 };
 
 // Listen for new messages until timeout is hit
@@ -51,6 +57,7 @@ setTimeout(() => {
   subscription.removeListener('message', messageHandler);
   console.log(`${messageCount} message(s) received.`);
 }, 30000 * 1000);
+
 
 
 function getModel () {
