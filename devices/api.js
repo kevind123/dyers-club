@@ -52,11 +52,11 @@ const messageHandler = (message) => {
 };
 
 // Listen for new messages until timeout is hit
-subscription.on(`message`, messageHandler);
-setTimeout(() => {
-  subscription.removeListener('message', messageHandler);
-  console.log(`${messageCount} message(s) received.`);
-}, 30000 * 1000);
+// subscription.on(`message`, messageHandler);
+// setTimeout(() => {
+//   subscription.removeListener('message', messageHandler);
+//   console.log(`${messageCount} message(s) received.`);
+// }, 30000 * 1000);
 
 
 
@@ -96,7 +96,7 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     dataObj = JSON.parse(decodedData.toString());
 
     // console.log("entryData: ", entryData);
-    // console.log("dataObj: ", dataObj);
+    console.log("dataObj: ", dataObj);
     // console.log("dataObj.usages: ", dataObj.usages);
     // console.log("dataObj.events: ", dataObj.events);
 
