@@ -48,7 +48,6 @@ const messageHandler = (message) => {
   message.ack();
 
   //TODO call addDeviceData
-  // check if message.data.
 };
 
 // Listen for new messages until timeout is hit
@@ -57,7 +56,6 @@ const messageHandler = (message) => {
 //   subscription.removeListener('message', messageHandler);
 //   console.log(`${messageCount} message(s) received.`);
 // }, 30000 * 1000);
-
 
 
 function getModel () {
