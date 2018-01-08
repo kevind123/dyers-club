@@ -45,7 +45,8 @@ router.get('/', (req, res, next) => {
 
     res.render('devices/list.pug', {
       devices: entities.map(entity => {
-        const createdAt = new Date(entity.timestamp * 1000)
+        const createdAt = new Date(entity.publishTime)
+
         return {
           createdAt: `${createdAt.getMonth() - 1}/${createdAt.getDate()}/${createdAt.getFullYear()} ${createdAt.getHours()}:${createdAt.getMinutes()}:${createdAt.getSeconds()}`,
           usageType: entity.usageType,

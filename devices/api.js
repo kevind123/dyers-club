@@ -64,8 +64,11 @@ function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
 }
 
-function addDeviceData (streams, reqBody, next) {
-  getModel().create(reqBody, (err, entity) => {
+function addDeviceData (data, publishTime, next) {
+  getModel().create({
+    ...data,
+    publishTime
+  }, (err, entity) => {
     if (err) {
       next(err);
       return;
@@ -98,10 +101,10 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     // console.log("dataObj.events: ", dataObj.events);
 
     if (dataObj.usages) {
-      addDeviceData(dataObj.usages, reqBody, next);
+      addDeviceData(dataObj, publishTime, next);
     }
     if (dataObj.events) {
-      addDeviceData(dataObj.events, reqBody, next);
+      addDeviceData(dataObj, publishTime, next);
     }
 
     res.status(200).send('OK');
