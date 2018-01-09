@@ -65,7 +65,7 @@ function getModel () {
 function addDeviceData (data, publishTime, next) {
   getModel().create({
     ...data,
-    publishTime
+    publishTime: publishTime || moment().format()
   }, (err, entity) => {
     if (err) {
       next(err);
@@ -94,15 +94,13 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     dataObj = JSON.parse(decodedData.toString());
 
     // console.log("entryData: ", entryData);
-    console.log("dataObj: ", dataObj);
-    // console.log("dataObj.usages: ", dataObj.usages);
-    // console.log("dataObj.events: ", dataObj.events);
+    // console.log("dataObj: ", dataObj);
 
     if (dataObj.usages) {
-      addDeviceData(dataObj, publishTime, next);
+      addDeviceData(dataObj, reqBody.publishTime, next);
     }
     if (dataObj.events) {
-      addDeviceData(dataObj, publishTime, next);
+      addDeviceData(dataObj, reqBody.publishTime, next);
     }
 
     res.status(200).send('OK');

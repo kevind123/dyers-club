@@ -15,6 +15,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const moment = require('moment');
 
 function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
@@ -48,10 +49,10 @@ router.get('/', (req, res, next) => {
         const createdAt = new Date(entity.publishTime)
 
         return {
-          createdAt: `${createdAt.getMonth() - 1}/${createdAt.getDate()}/${createdAt.getFullYear()} ${createdAt.getHours()}:${createdAt.getMinutes()}:${createdAt.getSeconds()}`,
+          createdAt: moment(entity.publishTime).format(),
           usageType: entity.usageType,
           siteCd: entity.siteCd,
-          values: JSON.stringify(entity.values)
+          values: JSON.stringify(entity.usages || entity.events)
         }
       }),
       nextPageToken: cursor
