@@ -47,7 +47,8 @@ const messageHandler = (message) => {
   // "Ack" (acknowledge receipt of) the message
   message.ack();
 
-  //TODO call addDeviceData
+  //save to db
+  addDeviceData(message.data, message.publishTime, next);
 };
 
 // Listen for new messages until timeout is hit
@@ -96,12 +97,7 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
     // console.log("entryData: ", entryData);
     // console.log("dataObj: ", dataObj);
 
-    if (dataObj.usages) {
-      addDeviceData(dataObj, reqBody.publishTime, next);
-    }
-    if (dataObj.events) {
-      addDeviceData(dataObj, reqBody.publishTime, next);
-    }
+    addDeviceData(dataObj, reqBody.publishTime, next);
 
     res.status(200).send('OK');
   } else {
