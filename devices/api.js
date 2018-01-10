@@ -20,7 +20,7 @@ const moment = require('moment');
 const PubSub = require('@google-cloud/pubsub');
 
 
-//Pull Subscription
+//*** Pull Subscription ***//
 const projectId = 'candi-dev';
 const subscriptionName = 'Dyer-Club-PULL.APT_GOOGLE_PUBSUB.subscription.114';
 const keyFilename = '/Users/kevind/candi/dyers-club/google-cloud-auth.json';
@@ -31,9 +31,8 @@ const pubsub = PubSub({
   keyFilename: keyFilename
 });
 
+// Event handler for PubSub messages
 const subscription = pubsub.subscription(subscriptionName);
-
-// Event handler to handle PubSub messages
 let messageCount = 0;
 const messageHandler = (message) => {
   console.log(`Received message ${message.id}:`);
@@ -52,17 +51,20 @@ const messageHandler = (message) => {
 };
 
 // Listen for new messages until timeout is hit
-// subscription.on(`message`, messageHandler);
-// setTimeout(() => {
-//   subscription.removeListener('message', messageHandler);
-//   console.log(`${messageCount} message(s) received.`);
-// }, 30000 * 1000);
+subscription.on(`message`, messageHandler);
+setTimeout(() => {
+  subscription.removeListener('message', messageHandler);
+  console.log(`${messageCount} message(s) received.`);
+}, 30000 * 1000);
+
+//*** END of PULL Subscription ***//
 
 
 function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
 }
 
+//Save data packet to data base
 function addDeviceData (data, publishTime, next) {
   getModel().create({
     ...data,
@@ -76,7 +78,6 @@ function addDeviceData (data, publishTime, next) {
 }
 
 const router = express.Router();
-
 // Automatically parse request body as JSON
 router.use(bodyParser.json());
 
@@ -93,9 +94,6 @@ router.post('/_ah/push-handlers/time-series/telemetry', (req, res, next) => {
   if (entryData) {
     decodedData = Buffer.from(entryData, 'base64');
     dataObj = JSON.parse(decodedData.toString());
-
-    // console.log("entryData: ", entryData);
-    // console.log("dataObj: ", dataObj);
 
     addDeviceData(dataObj, reqBody.publishTime, next);
 

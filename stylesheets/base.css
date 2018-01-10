@@ -1,0 +1,11 @@
+.media-body {
+	overflow-y: scroll;
+	max-height: 200px;
+	width: 100%;
+	display: inline-block;
+	border-bottom: 1px solid #454545;
+
+	&:nth-child(odd) {
+		background-color: rgba(0,0,0,0.05);
+	}
+}
