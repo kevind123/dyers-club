@@ -1,5 +1,5 @@
 # Description
-    This sample python code allows you to:
+    This sample Node.js app allows you to:
 
     1. Receive pushed data from Google Pub/Sub as a POST request. Example works from https://{yourDomain}/devices/_ah/push-handlers/time-series/telemetry
     2. Pull data from Google Pub/Sub. Example code is commented out by default and located in api.js 
