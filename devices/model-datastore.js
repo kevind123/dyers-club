@@ -130,8 +130,6 @@ function update (id, data, cb) {
     data: toDatastore(data, ['values'])
   };
 
-  console.log("saving entity key: ", key)
-
   ds.save(
     entity,
     (err) => {

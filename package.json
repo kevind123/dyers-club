@@ -65,7 +65,8 @@
     "nconf": "0.8.5",
     "prompt": "1.0.0",
     "pug": "2.0.0-rc.4",
-    "uglify-js": "3.1.6"
+    "uglify-js": "3.1.6",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "2.1.0",
