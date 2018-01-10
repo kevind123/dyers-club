@@ -44,21 +44,24 @@ router.get('/', (req, res, next) => {
       return;
     }
 
-    const sortedEntries = _.sortBy(entities, e => {
-      return Date(e.publishTime).valueOf()
+    const nextEntities = entities.map(entity => {
+      const createdAt = moment(entity.publishTime)
+      return {
+        id: entity.id,
+        createdAt: createdAt.format('MMM D, YYYY h:mm:ss a'),
+        publishTime: entity.publishTime,
+        usageType: entity.usageType,
+        siteCd: entity.siteCd,
+        values: JSON.stringify(entity.usages || entity.events)
+      }
+    })
+
+    const sortedEntries = _.sortBy(nextEntities, e => {
+      return moment(e.publishTime).valueOf()
     }).reverse()
 
     res.render('devices/list.pug', {
-      devices: entities.map(entity => {
-        const createdAt = new Date(entity.publishTime)
-        return {
-          id: entity.id,
-          createdAt: moment(entity.publishTime).format('llll'),
-          usageType: entity.usageType,
-          siteCd: entity.siteCd,
-          values: JSON.stringify(entity.usages || entity.events)
-        }
-      }),
+      devices: sortedEntries,
       nextPageToken: cursor
     });
   });
