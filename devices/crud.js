@@ -16,13 +16,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment');
+const _ = require('underscore');
 
 function getModel () {
   return require(`./model-${require('../config').get('DATA_BACKEND')}`);
 }
 
 const router = express.Router();
-
 // Automatically parse request body as form data
 router.use(bodyParser.urlencoded({ extended: false }));
 
@@ -44,12 +44,16 @@ router.get('/', (req, res, next) => {
       return;
     }
 
+    const sortedEntries = _.sortBy(entities, e => {
+      return Date(e.publishTime).valueOf()
+    }).reverse()
+
     res.render('devices/list.pug', {
       devices: entities.map(entity => {
         const createdAt = new Date(entity.publishTime)
-
         return {
-          createdAt: moment(entity.publishTime).format(),
+          id: entity.id,
+          createdAt: moment(entity.publishTime).format('llll'),
           usageType: entity.usageType,
           siteCd: entity.siteCd,
           values: JSON.stringify(entity.usages || entity.events)
