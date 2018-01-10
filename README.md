@@ -1,12 +1,14 @@
-# 2 - Structured data
+# Description
+    This sample python code allows you to:
 
-This folder contains the sample code for the [Structured data][step-2]
-tutorial. Please refer to the tutorial for instructions on configuring, running,
-and deploying this sample.
+    1. Receive pushed data from Google Pub/Sub as a POST request. Example works from https://{yourDomain}/devices/_ah/push-handlers/time-series/telemetry
+    2. Pull data from Google Pub/Sub. Example code is commented out by default and located in api.js 
+    3. List all data that has been pushed or pulled from https://{yourDomain}/devices
 
-[step-2]: https://cloud.google.com/nodejs/getting-started/using-structured-data
+# Google Pub/Sub Overview Documentation
+    https://candicontrols.atlassian.net/wiki/spaces/DOCS/pages/54460420/Google+Pub+Sub+Overview
 
-# Simple instructions
+# Simple Setup instructions
 
 1.  Install [Node.js](https://nodejs.org/en/).
 
@@ -27,11 +29,11 @@ and deploying this sample.
 
 1.  Clone the repository:
 
-        git clone https://github.com/GoogleCloudPlatform/nodejs-getting-started.git
+        git clone https://github.com/your-repo.git
 
 1.  Change directory:
 
-        cd nodejs-getting-started/2-structured-data
+        cd your-repo
 
 1.  Create a `config.json` file (copied from the `config-default.json` file):
 
@@ -40,7 +42,7 @@ and deploying this sample.
     * Set `GCLOUD_PROJECT` in `config.json` to your Google Cloud Platform
       project ID.
     * Set `DATA_BACKEND` in `config.json` to one of `"datastore"`, `"cloudsql"`,
-      or `"mongodb"`.
+      or `"mongodb"`. Note that This example uses datastore.
 
 1.  Install dependencies using NPM or Yarn:
 
@@ -96,4 +98,3 @@ and deploying this sample.
         gcloud app deploy
 
 1.  View the deployed app at [https://YOUR_PROJECT_ID.appspot.com](https://YOUR_PROJECT_ID.appspot.com).
-# dyers-club
