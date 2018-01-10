@@ -33,6 +33,9 @@ app.get('/', (req, res) => {
   res.redirect('/devices');
 });
 
+//Static assets
+app.use(express.static('public'))
+
 // Basic 404 handler
 app.use((req, res) => {
   res.status(404).send('Not Found');
